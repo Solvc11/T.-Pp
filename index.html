@@ -1,0 +1,153 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Control de temperatura - Unidad Obstétrica</title><style>
+:root{font-family:system-ui,Arial;color:#183048;background:#f3f7fa}*{box-sizing:border-box}body{margin:0}.wrap{max-width:1100px;margin:auto;padding:14px}header{background:#086b80;color:white;padding:18px;border-radius:12px;margin-bottom:12px}h1{font-size:1.25rem;margin:0}h2{font-size:1.05rem;margin:10px 0}.panel{background:white;border:1px solid #d7e2e8;border-radius:12px;padding:14px;margin:12px 0}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.two{grid-template-columns:repeat(2,minmax(0,1fr))}label{display:block;font-size:.84rem;font-weight:600;margin:4px 0}input,select,textarea{width:100%;padding:10px;border:1px solid #9eb5c1;border-radius:7px;font:inherit;background:white}textarea{min-height:65px}button{padding:10px 13px;border:0;border-radius:7px;background:#08768b;color:white;font-weight:650;cursor:pointer;margin:4px 4px 4px 0}.secondary{background:#405c70}.danger{background:#a43232}.scroll{overflow:auto}.chart-grid{display:grid;grid-template-columns:1fr;gap:12px;margin:14px 0}.chart-card{border:1px solid #d6e1e8;border-radius:10px;padding:10px;break-inside:avoid;page-break-inside:avoid}.chart-card h3{font-size:14px;margin:0 0 3px}.chart-card p{font-size:11px;color:#516b78;margin:0 0 5px}.chart-card svg{width:100%;height:auto;display:block}.legend{font-size:11px;display:flex;flex-wrap:wrap;gap:14px}.legend span:before{content:"";display:inline-block;width:16px;height:3px;vertical-align:middle;margin-right:4px;background:var(--line)}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #b9cbd4;padding:6px;text-align:center}th{background:#e8f3f7}td.obs{text-align:left;min-width:130px}small,.hint{color:#516b78}.status{margin-top:8px;font-weight:600}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:end}.toolbar>div{min-width:135px;flex:1}.missing{background:#fff5e9}.actions{white-space:nowrap}.actions button{padding:5px;font-size:11px}#printTitle{display:none}@media(max-width:650px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.grid input{padding:8px 4px;font-size:14px}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:8px}.panel{padding:10px}h1{font-size:1.1rem}}@media print{@page{size:letter landscape;margin:8mm}body{background:white;color:black}.wrap{max-width:none;padding:0}header,.no-print,#formPanel{display:none!important}#printTitle{display:block}#reportPanel{border:0;padding:0;margin:0}table{font-size:8px}th,td{padding:3px;overflow-wrap:anywhere}th{background:#eee!important;print-color-adjust:exact}.missing{background:white}td.obs{min-width:0}#summary{font-size:10px}.chart-grid{gap:5px;margin:6px 0}.chart-card{padding:4px;border:1px solid #999}.chart-card h3{font-size:10px}.chart-card p{font-size:8px}.legend{font-size:8px}.chart-card svg{max-height:115px}#reportPanel .scroll{overflow:visible}#reportPanel{width:100%} .chart-card svg text{font-size:9px} .chart-card{break-inside:avoid;page-break-inside:avoid}}
+</style></head><body><main class="wrap"><header><h1>🌡️ Control de temperatura y humedad</h1><div>Refrigerador de fármacos · Unidad Obstétrica</div></header><section class="panel no-print"><div class="hint">Registro manual de dos turnos diarios. Los datos quedan guardados en este navegador. Para compartir entre equipos se requiere almacenamiento centralizado.</div></section><section class="panel" id="formPanel"><h2>Nuevo registro / editar registro</h2><div class="grid two"><div><label for="fecha">Fecha</label><input type="date" id="fecha" required></div><div><label for="turno">Turno</label><select id="turno"><option value="Largo">Largo</option><option value="Noche">Noche</option></select></div></div><div class="grid two"><div><label for="hora">Hora de medición</label><input type="time" id="hora"></div><div><label for="responsable">Responsable (nombre/iniciales)</label><input id="responsable" maxlength="70" autocomplete="off"></div></div><h2>Refrigerador de fármacos (°C)</h2><div class="grid" id="refri"></div><h2>Temperatura ambiente (°C)</h2><div class="grid" id="amb"></div><h2>Humedad ambiente (%)</h2><div class="grid" id="hum"></div><label for="obs">Observaciones / acciones correctivas</label><textarea id="obs" maxlength="1500" placeholder="Describir anomalías, acciones realizadas o novedades del turno"></textarea><div><button id="save">Guardar registro</button><button class="secondary" id="clear">Limpiar formulario</button></div><div id="message" class="status" role="status"></div></section><section class="panel" id="reportPanel"><h2 id="printTitle">Informe de control de temperatura y humedad · Unidad Obstétrica</h2><h2 class="no-print">Historial e informes</h2><div class="toolbar no-print"><div><label for="mode">Informe</label><select id="mode"><option value="monthly">Mensual</option><option value="daily">Diario</option></select></div><div id="monthBox"><label for="month">Mes</label><input type="month" id="month"></div><div id="dayBox" hidden><label for="day">Día</label><input type="date" id="day"></div></div><div class="no-print"><button id="pdf">⬇ Descargar PDF con gráficos</button><button id="print" class="secondary">Imprimir informe</button><button class="secondary" id="csv">Exportar CSV</button><button class="secondary" id="backup">Respaldar JSON</button><button class="secondary" id="restore">Importar respaldo</button><input type="file" id="file" accept="application/json,.json" hidden></div><p id="summary"></p><p class="hint no-print">Los gráficos aparecen al guardar las mediciones. Si aún no hay registros, verás el aviso «Sin mediciones». El PDF se descarga directamente.</p><div class="chart-grid" id="charts" aria-label="Gráficos de seguimiento"></div><div class="scroll"><table><thead><tr><th>Fecha</th><th>Turno</th><th>Hora</th><th>Ref. mín °C</th><th>Ref. máx °C</th><th>Ref. prom °C</th><th>Amb. mín °C</th><th>Amb. máx °C</th><th>Amb. prom °C</th><th>Hum. mín %</th><th>Hum. máx %</th><th>Hum. prom %</th><th>Responsable</th><th>Observaciones</th><th class="no-print">Acciones</th></tr></thead><tbody id="rows"></tbody></table></div><p class="hint no-print">La tabla mensual muestra ambos turnos, incluso si falta un registro. No introduzca datos identificatorios de pacientes.</p></section></main><script>
+'use strict';const KEY='obstetricia_temperaturas_v1';const $=id=>document.getElementById(id);const fields=['rmin','rmax','ravg','amin','amax','aavg','hmin','hmax','havg'];const today=()=>{let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};let records=[];try{const parsed=JSON.parse(localStorage.getItem(KEY)||'[]');records=Array.isArray(parsed)?parsed:[]}catch{records=[]}for(const [id,prefix] of [['refri','r'],['amb','a'],['hum','h']]){for(const [suffix,title] of [['min','Mínima'],['max','Máxima'],['avg','Promedio']]){const name=prefix+suffix;const div=document.createElement('div');const lab=document.createElement('label');lab.htmlFor=name;lab.textContent=title;const inp=document.createElement('input');inp.id=name;inp.type='number';inp.step='0.1';inp.inputMode='decimal';inp.placeholder=prefix==='h'?'%':'°C';inp.required=true;div.append(lab,inp);$(id).append(div)}}$('fecha').value=today();$('day').value=today();$('month').value=today().slice(0,7);const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function persist(){localStorage.setItem(KEY,JSON.stringify(records))}function reset(){for(const id of [...fields,'hora','responsable','obs'])$(id).value='';$('message').textContent=''}function checkTriple(a,b,c,name,humidity){if([a,b,c].some(v=>!Number.isFinite(v)))throw Error(`Complete los tres valores de ${name}.`);if(a>b||c<a||c>b)throw Error(`Revise ${name}: mínima ≤ promedio ≤ máxima.`);if(humidity&&(a<0||b>100))throw Error('La humedad debe estar entre 0 y 100 %.');if(!humidity&&(a< -60||b>80))throw Error(`Valores fuera del rango permitido para ${name}.`)}function read(){const date=$('fecha').value;if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||new Date(date+'T12:00:00').toISOString().slice(0,10)!==date)throw Error('Ingrese una fecha válida.');const r={date,shift:$('turno').value,hour:$('hora').value,person:$('responsable').value.trim(),obs:$('obs').value.trim()};for(const f of fields){if($(f).value.trim()==='')throw Error('Complete todas las mediciones.');r[f]=Number($(f).value)}checkTriple(r.rmin,r.rmax,r.ravg,'refrigerador',false);checkTriple(r.amin,r.amax,r.aavg,'temperatura ambiente',false);checkTriple(r.hmin,r.hmax,r.havg,'humedad',true);if(!r.person)throw Error('Ingrese responsable.');return r}function save(){try{const r=read();const idx=records.findIndex(x=>x.date===r.date&&x.shift===r.shift);if(idx>=0&&!confirm('Ya existe un registro para este día y turno. ¿Desea reemplazarlo?'))return;if(idx>=0)records[idx]=r;else records.push(r);persist();$('message').textContent='✓ Registro guardado en este dispositivo.';render()}catch(e){$('message').textContent='⚠ '+e.message}}$('save').onclick=save;$('clear').onclick=reset;function dates(){const mode=$('mode').value;if(mode==='daily')return [$('day').value].filter(Boolean);const [y,m]=$('month').value.split('-').map(Number);if(!y||!m)return[];const n=new Date(y,m,0).getDate();return Array.from({length:n},(_,i)=>`${y}-${String(m).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`)}function view(){const result=[];for(const date of dates())for(const shift of ['Largo','Noche'])result.push(records.find(r=>r.date===date&&r.shift===shift)||{date,shift});return result}function render(){const data=view();$('rows').replaceChildren();let filled=0;for(const r of data){const exists=fields.every(f=>typeof r[f]==='number');if(exists)filled++;const tr=document.createElement('tr');if(!exists)tr.className='missing';const values=[r.date,r.shift,r.hour||'—',...fields.map(f=>r[f]??'—'),r.person||'—',r.obs||'—'];values.forEach((v,i)=>{const td=document.createElement('td');td.textContent=v;if(i===13)td.className='obs';tr.append(td)});const action=document.createElement('td');action.className='actions no-print';if(exists){const edit=document.createElement('button');edit.textContent='Editar';edit.onclick=()=>{for(const f of fields)$(f).value=r[f];$('fecha').value=r.date;$('turno').value=r.shift;$('hora').value=r.hour||'';$('responsable').value=r.person||'';$('obs').value=r.obs||'';window.scrollTo({top:0,behavior:'smooth'})};const del=document.createElement('button');del.textContent='Eliminar';del.className='danger';del.onclick=()=>{if(confirm(`¿Eliminar registro ${r.date} / ${r.shift}?`)){records=records.filter(x=>!(x.date===r.date&&x.shift===r.shift));persist();render()}};action.append(edit,del)}tr.append(action);$('rows').append(tr)}$('summary').textContent=`Período: ${$('mode').value==='monthly'?$('month').value:$('day').value} · Registros completos: ${filled} de ${data.length} · Pendientes: ${data.length-filled}`;renderCharts(data)}// Gráficos SVG propios: funcionan sin conexión, sin bibliotecas externas y se imprimen junto con las tablas.
+function renderCharts(data){
+ const host=$('charts');host.replaceChildren();
+ const monthly=$('mode').value==='monthly';
+ const definitions=[
+  {title:'Refrigerador de fármacos',unit:'°C',keys:['rmin','ravg','rmax']},
+  {title:'Temperatura ambiente',unit:'°C',keys:['amin','aavg','amax']},
+  {title:'Humedad ambiental',unit:'%',keys:['hmin','havg','hmax']}
+ ];
+ const colors=['#2475b5','#13866c','#d66b25'];
+ for(const group of definitions){
+  const section=document.createElement('section');section.className='chart-card';
+  const title=document.createElement('h3');title.textContent=group.title+' ('+group.unit+')';section.append(title);
+  const subtitle=document.createElement('p');subtitle.textContent=monthly?'Evolución por día y turno (L = largo, N = noche)':'Comparación de turno largo y noche';section.append(subtitle);
+  const vals=data.flatMap(r=>group.keys.map(k=>r[k]).filter(v=>typeof v==='number'&&Number.isFinite(v)));
+  if(!vals.length){const note=document.createElement('p');note.textContent='Sin mediciones para graficar en este período.';section.append(note);host.append(section);continue}
+  let lower=Math.min(...vals),upper=Math.max(...vals);const pad=Math.max((upper-lower)*.12,group.unit==='%'?2:.5);
+  lower-=pad;upper+=pad;if(group.unit==='%'){lower=Math.max(0,lower);upper=Math.min(100,upper)}
+  if(upper<=lower){upper=lower+1}
+  const W=900,H=195,L=54,R=16,T=15,B=35,ww=W-L-R,hh=H-T-B;
+  const x=i=>L+(data.length===1?ww/2:i*ww/(data.length-1));
+  const y=v=>T+(upper-v)/(upper-lower)*hh;
+  const esc=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfico de ${esc(group.title)} con líneas de valores mínimo, promedio y máximo">`;
+  for(let t=0;t<=4;t++){const num=lower+(upper-lower)*(4-t)/4,yy=T+hh*t;svg+=`<line x1="${L}" y1="${yy}" x2="${W-R}" y2="${yy}" stroke="#dce5ea" stroke-width="1"/><text x="${L-7}" y="${yy+4}" text-anchor="end" font-size="12" fill="#425869">${num.toFixed(1)}</text>`}
+  // Fecha visible en cada cuarto día; puntos intercalados largo y noche.
+  data.forEach((r,i)=>{if(!monthly||i%8===0||i===data.length-1){const lbl=monthly?r.date.slice(8)+' '+(r.shift==='Largo'?'L':'N'):r.shift;svg+=`<text x="${x(i)}" y="${H-13}" text-anchor="middle" font-size="12" fill="#425869">${lbl}</text>`}});
+  group.keys.forEach((key,j)=>{
+   let segment=[];
+   const flush=()=>{if(segment.length>1)svg+=`<polyline points="${segment.join(' ')}" fill="none" stroke="${colors[j]}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;segment=[]};
+   data.forEach((r,i)=>{const v=r[key];if(typeof v==='number'&&Number.isFinite(v)){segment.push(`${x(i).toFixed(1)},${y(v).toFixed(1)}`)}else flush()});flush();
+   data.forEach((r,i)=>{const v=r[key];if(typeof v==='number'&&Number.isFinite(v)){const label=`${r.date} ${r.shift}: ${['Mínima','Promedio','Máxima'][j]} ${v} ${group.unit}`;svg+=`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="${monthly?2.6:5}" fill="${colors[j]}"><title>${esc(label)}</title></circle>`}})
+  });
+  svg+='</svg>';
+  const plot=document.createElement('div');plot.innerHTML=svg;section.append(plot);
+  const legend=document.createElement('div');legend.className='legend';['Mínima','Promedio','Máxima'].forEach((label,i)=>{const span=document.createElement('span');span.style.setProperty('--line',colors[i]);span.textContent=label;legend.append(span)});section.append(legend);host.append(section);
+ }
+}
+$('mode').onchange=()=>{$('monthBox').hidden=$('mode').value!=='monthly';$('dayBox').hidden=$('mode').value!=='daily';render()};$('month').onchange=render;$('day').onchange=render;$('print').onclick=()=>window.print();function download(filename,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000)}$('csv').onclick=()=>{const header=['Fecha','Turno','Hora',...fields,'Responsable','Observaciones'];const data=view().map(r=>[r.date,r.shift,r.hour||'',...fields.map(f=>r[f]??''),r.person||'',r.obs||'']);const quote=x=>'"'+String(x).replace(/"/g,'""')+'"';download('control_temperatura_'+($('mode').value==='monthly'?$('month').value:$('day').value)+'.csv','\ufeff'+[header,...data].map(row=>row.map(quote).join(';')).join('\r\n'),'text/csv;charset=utf-8')};$('backup').onclick=()=>download('respaldo_temperaturas_'+today()+'.json',JSON.stringify({version:1,records},null,2),'application/json');$('restore').onclick=()=>$('file').click();$('file').onchange=async e=>{try{const file=e.target.files[0];if(!file)return;const data=JSON.parse(await file.text());if(!Array.isArray(data.records)||data.records.length>20000)throw Error('Formato de respaldo no válido.');const clean=[];for(const r of data.records){if(!/^\d{4}-\d{2}-\d{2}$/.test(r.date)||!['Largo','Noche'].includes(r.shift))throw Error('Registro inválido.');for(const f of fields)if(typeof r[f]!=='number'||!Number.isFinite(r[f]))throw Error('Medición inválida.');checkTriple(r.rmin,r.rmax,r.ravg,'refrigerador',false);checkTriple(r.amin,r.amax,r.aavg,'ambiente',false);checkTriple(r.hmin,r.hmax,r.havg,'humedad',true);clean.push({date:r.date,shift:r.shift,hour:String(r.hour||'').slice(0,5),person:String(r.person||'').slice(0,70),obs:String(r.obs||'').slice(0,1500),...Object.fromEntries(fields.map(f=>[f,r[f]]))})}if(!confirm('Importar respaldo reemplazará todos los registros guardados en este dispositivo. ¿Continuar?'))return;records=clean;persist();render();alert('Respaldo importado correctamente.')}catch(err){alert('No se pudo importar: '+err.message)}finally{e.target.value=''}};
+// Exportador PDF independiente: no depende de ventanas emergentes, internet ni bibliotecas CDN.
+function exportPDF(){
+ try{
+ const data=view(), completed=data.filter(r=>fields.every(f=>typeof r[f]==='number'));
+ const period=$('mode').value==='monthly'?$('month').value:$('day').value;
+ const PAGE_W=792,PAGE_H=612, M=28;
+ const pages=[];let ops=[];
+ const textSafe=x=>String(x??'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x20-\x7e]/g,'?');
+ const escPDF=x=>textSafe(x).replace(/[\\()]/g,'\\$&');
+ const color=(r,g,b)=>`${r} ${g} ${b} rg\n`;
+ const stroke=(r,g,b)=>`${r} ${g} ${b} RG\n`;
+ const txt=(x,y,str,sz=9,bold=false)=>{ops.push('BT\n'+`/F${bold?2:1} ${sz} Tf\n`+`1 0 0 1 ${x.toFixed(2)} ${y.toFixed(2)} Tm\n`+`(${escPDF(str)}) Tj\nET\n`)};
+ const line=(x1,y1,x2,y2)=>ops.push(`${x1.toFixed(2)} ${y1.toFixed(2)} m ${x2.toFixed(2)} ${y2.toFixed(2)} l S\n`);
+ const rect=(x,y,w,h,fill=false)=>ops.push(`${x.toFixed(2)} ${y.toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re ${fill?'f':'S'}\n`);
+ const circle=(x,y,r)=>{const k=.5522847498*r;ops.push(`${(x+r).toFixed(2)} ${y.toFixed(2)} m ${(x+r).toFixed(2)} ${(y+k).toFixed(2)} ${(x+k).toFixed(2)} ${(y+r).toFixed(2)} ${x.toFixed(2)} ${(y+r).toFixed(2)} c ${(x-k).toFixed(2)} ${(y+r).toFixed(2)} ${(x-r).toFixed(2)} ${(y+k).toFixed(2)} ${(x-r).toFixed(2)} ${y.toFixed(2)} c ${(x-r).toFixed(2)} ${(y-k).toFixed(2)} ${(x-k).toFixed(2)} ${(y-r).toFixed(2)} ${x.toFixed(2)} ${(y-r).toFixed(2)} c ${(x+k).toFixed(2)} ${(y-r).toFixed(2)} ${(x+r).toFixed(2)} ${(y-k).toFixed(2)} ${(x+r).toFixed(2)} ${y.toFixed(2)} c f\n`)};
+ const newPage=()=>{if(ops.length)pages.push(ops.join(''));ops=[stroke(0.65,.72,.77),'0.5 w\n'];};
+ const footer=label=>{stroke(.6,.68,.72);line(M,24,PAGE_W-M,24);txt(M,12,label,7)};
+ newPage();
+ txt(M,570,'CONTROL DE TEMPERATURA Y HUMEDAD',17,true);
+ txt(M,553,'Refrigerador de farmacos - Unidad Obstetrica',10);
+ txt(M,535,`Informe: ${$('mode').value==='monthly'?'mensual':'diario'}  |  Periodo: ${period}  |  Registros: ${completed.length} de ${data.length}  |  Pendientes: ${data.length-completed.length}`,9);
+ const graphs=[
+  {name:'Refrigerador de farmacos (C)',keys:['rmin','ravg','rmax'],unit:'C'},
+  {name:'Temperatura ambiente (C)',keys:['amin','aavg','amax'],unit:'C'},
+  {name:'Humedad ambiental (%)',keys:['hmin','havg','hmax'],unit:'%'}
+ ];
+ const colors=[[.15,.46,.72],[.08,.52,.42],[.84,.42,.14]];
+ graphs.forEach((g,gi)=>{
+  const x0=68,yTop=507-gi*159,w=674,h=112;
+  txt(M,yTop+9,g.name,10,true);
+  const valid=data.flatMap(r=>g.keys.map(k=>r[k]).filter(v=>typeof v==='number'&&isFinite(v)));
+  stroke(.68,.73,.78);rect(x0,yTop-h,w,h);
+  if(!valid.length){txt(x0+10,yTop-55,'Sin mediciones registradas para este periodo',9);return}
+  let min=Math.min(...valid),max=Math.max(...valid),pad=Math.max((max-min)*.12,g.unit==='%'?2:.5);
+  min-=pad;max+=pad;if(g.unit==='%'){min=Math.max(0,min);max=Math.min(100,max)}if(max<=min)max=min+1;
+  const xx=i=>x0+12+(data.length===1?w/2:i*(w-24)/(data.length-1));
+  const yy=v=>yTop-8-(v-min)/(max-min)*(h-18);
+  for(let i=0;i<=3;i++){
+    const v=min+(max-min)*i/3,py=yy(v);stroke(.84,.88,.90);line(x0,py,x0+w,py);txt(M,py-2,v.toFixed(1),7);
+  }
+  for(let j=0;j<3;j++){
+   const [r,gc,b]=colors[j];stroke(r,gc,b);ops.push('1.45 w\n');
+   let prev=null;
+   data.forEach((r,i)=>{const v=r[g.keys[j]];if(typeof v!=='number'||!isFinite(v)){prev=null;return}
+      const px=xx(i),py=yy(v);if(prev)line(prev.x,prev.y,px,py);prev={x:px,y:py};
+   });
+   ops.push(color(r,gc,b));
+   data.forEach((r,i)=>{const v=r[g.keys[j]];if(typeof v==='number'&&isFinite(v))circle(xx(i),yy(v),data.length>10?1.6:2.4)});
+  }
+  stroke(.5,.55,.6);ops.push('0.5 w\n');
+  const labels=data.length<=2?data.map((r,i)=>i):data.map((r,i)=>i).filter(i=>i%Math.max(1,Math.ceil(data.length/10))===0||i===data.length-1);
+  labels.forEach(i=>{const r=data[i];txt(xx(i)-9,yTop-h-12,data.length<=2?r.shift:(r.date.slice(-2)+(r.shift==='Largo'?'L':'N')),6.5)});
+  txt(x0+220,yTop+10,'Minima  /  Promedio  /  Maxima',7.5);
+ });
+ footer('Informe generado desde el registro local. Verificar datos antes de archivo institucional.');
+ newPage();
+ // Tabla por pagina, 2 turnos por dia y campos de observacion.
+ const cols=[42,39,30,37,37,37,37,37,37,37,37,37,65,111];
+ const headers=['Fecha','Turno','Hora','R min','R max','R prom','A min','A max','A prom','H min','H max','H prom','Responsable','Observaciones'];
+ const xPositions=[M];cols.forEach(w=>xPositions.push(xPositions.at(-1)+w));
+ const rowH=16,headY=532,perPage=29;
+ for(let base=0;base<data.length;base+=perPage){
+  if(base>0)newPage();
+  txt(M,571,'REGISTROS DE TEMPERATURA Y HUMEDAD',14,true);
+  txt(M,554,`Periodo ${period}  |  Filas ${base+1}-${Math.min(data.length,base+perPage)} de ${data.length}`,9);
+  ops.push(color(.92,.95,.97));rect(M,headY,cols.reduce((a,b)=>a+b,0),20,true);
+  stroke(.55,.62,.69);
+  headers.forEach((h,i)=>txt(xPositions[i]+2,headY+7,h,7,true));
+  data.slice(base,base+perPage).forEach((r,j)=>{
+   const bottom=headY-(j+1)*rowH;
+   if(j%2===1){ops.push(color(.96,.97,.98));rect(M,bottom,cols.reduce((a,b)=>a+b,0),rowH,true)}
+   const v=[r.date.slice(5),r.shift,r.hour||'-',...fields.map(f=>r[f]===undefined?'-':String(r[f])),r.person||'-',r.obs||'-'];
+   v.forEach((raw,i)=>{
+    const maxChars=Math.max(4,Math.floor((cols[i]-4)/(i>=12?3.4:3.75)));
+    const val=textSafe(raw);const clipped=val.length>maxChars?val.slice(0,maxChars-1)+'~':val;
+    txt(xPositions[i]+2,bottom+5,clipped,6.8);
+   });
+   line(M,bottom,xPositions.at(-1),bottom);
+  });
+  xPositions.forEach(x=>line(x,headY+20,x,headY-Math.min(perPage,data.length-base)*rowH));
+  footer('R = refrigerador C | A = ambiente C | H = humedad % | ~ = texto truncado en la tabla PDF');
+ }
+ if(!data.length){txt(M,500,'No hay datos en el periodo indicado.',10)}
+ pages.push(ops.join(''));
+ // Formato PDF 1.4 con tabla xref calculada en bytes UTF-8 (documento ASCII compatible).
+ const objects=[null];const add=o=>{objects.push(o);return objects.length-1};
+ const catalog=add('');const pagesId=add('');
+ const font1=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+ const font2=add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+ const ids=[];
+ pages.forEach(page=>{
+   const length=new TextEncoder().encode(page).length;
+   const contentId=add(`<< /Length ${length} >>\nstream\n${page}endstream`);
+   const pageId=add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${PAGE_W} ${PAGE_H}] /Resources << /Font << /F1 ${font1} 0 R /F2 ${font2} 0 R >> >> /Contents ${contentId} 0 R >>`);
+   ids.push(pageId);
+ });
+ objects[catalog]=`<< /Type /Catalog /Pages ${pagesId} 0 R >>`;
+ objects[pagesId]=`<< /Type /Pages /Kids [${ids.map(i=>i+' 0 R').join(' ')}] /Count ${ids.length} >>`;
+ let output='%PDF-1.4\n',offsets=[0];
+ for(let i=1;i<objects.length;i++){offsets[i]=new TextEncoder().encode(output).length;output+=`${i} 0 obj\n${objects[i]}\nendobj\n`}
+ const xref=new TextEncoder().encode(output).length;
+ output+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;
+ for(let i=1;i<objects.length;i++)output+=`${String(offsets[i]).padStart(10,'0')} 00000 n \n`;
+ output+=`trailer\n<< /Size ${objects.length} /Root ${catalog} 0 R >>\nstartxref\n${xref}\n%%EOF`;
+ download('informe_temperatura_'+period+'.pdf',new TextEncoder().encode(output),'application/pdf');
+ $('message').textContent='PDF generado: revise la carpeta Descargas de su dispositivo.';
+ }catch(e){alert('No se pudo generar el PDF: '+e.message)}
+}
+$('pdf').onclick=exportPDF;
+render();
+</script></body></html>
